@@ -49,6 +49,7 @@ class App extends Component {
   }
 
   allToggle = () => {
+    this.getAllMessages();
     this.setState(state => ({ rb: !state.rb }));
   };
   boastToggle = () => {
@@ -80,14 +81,23 @@ class App extends Component {
       });
   };
   sortByUpvote = () => {
-    this.setState({
-      messages: [].concat(this.state.messages).sort((a, b) => a.like > b.like)
+    let newState = [].concat(this.state.messages).sort((a, b) => {
+      console.log(a, b);
+      return b.like - a.like;
     });
+    console.log(newState);
+    this.setState(state => ({
+      messages: newState
+    }));
   };
   sortByDownvote = () => {
-    this.setState({
-      messages: [].concat(this.state.messages).sort((a, b) => a.like < b.like)
-    });
+    let newState = []
+      .concat(this.state.messages)
+      .sort((a, b) => a.like - b.like);
+
+    this.setState(state => ({
+      messages: newState
+    }));
   };
 
   handelUpvote = async function(messageId) {
@@ -206,32 +216,38 @@ class App extends Component {
           <button type="submit">Submit</button>
           <br></br>
         </form>
-        <button onClick={sortByUpvote}> Upvotes </button>
+        <button onClick={event => sortByUpvote()}> Upvotes </button>
         <button onClick={sortByDownvote}> Downvotes </button>
-        <button onClick={allToggle}> all </button>
+        {/* <button onClick={allToggle}> all </button> */}
+        <button onClick={roastToggle}> Roast </button>
+        <button onClick={boastToggle}> Boast </button>
         <div>
           {
             {
-              all: this.state.messages.map(message => {
-                return (
-                  // we should be using <Message message={message} /> OR <Message displayName={message.displayName} /> to replace the <React.Fragment> section bellow
+              all: this.state.messages
+                .filter(function(message) {
+                  return message;
+                })
+                .map(message => {
+                  return (
+                    // we should be using <Message message={message} /> OR <Message displayName={message.displayName} /> to replace the <React.Fragment> section bellow
 
-                  <div>
-                    <h3>
-                      <p>{message.title}</p>
-                    </h3>
-                    <p>{message.text}</p>
-                    <h3>{message.is_boast ? <p>boast</p> : <p>roast</p>}</h3>
-                    <p>Votes: {message.like}</p>
-                    <button onClick={event => handelUpvote(message.id)}>
-                      upvote
-                    </button>
-                    <button onClick={event => handelDownvote(message.id)}>
-                      downvote
-                    </button>
-                  </div>
-                );
-              }),
+                    <div>
+                      <h3>
+                        <p>{message.title}</p>
+                      </h3>
+                      <p>{message.text}</p>
+                      <h3>{message.is_boast ? <p>boast</p> : <p>roast</p>}</h3>
+                      <p>Votes: {message.like}</p>
+                      <button onClick={event => handelUpvote(message.id)}>
+                        upvote
+                      </button>
+                      <button onClick={event => handelDownvote(message.id)}>
+                        downvote
+                      </button>
+                    </div>
+                  );
+                }),
               boast: this.state.messages
                 .filter(function(message) {
                   return message.is_boast === true;
